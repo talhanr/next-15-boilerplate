@@ -1,6 +1,6 @@
 import yup from "yup";
 import { ValidatorType } from "./types";
-
+import { TFunction } from "i18next";
 
 /**
  * Returns a Yup validation schema based on the provided `ValidatorType`.
@@ -52,3 +52,94 @@ export const getValidationMethod = <T>(type: ValidatorType): yup.Schema<T> => {
       throw new Error(`Unsupported type: ${type}`);
   }
 };
+
+/**
+ * Formats a string by replacing numbered placeholders with translated values.
+ *
+ * For each value in `replaceValues`, the function finds `{index}` in the string and
+ * replaces it with the translation for `form_fields.{value}` (using the `translate` function),
+ * falling back to the value itself if no translation is found.
+ *
+ * @param str - The string containing numbered placeholders like "{0}", "{1}", etc.
+ * @param replaceValues - An array of values to insert into the placeholders. Each value will be translated.
+ * @returns {string} The formatted string with placeholders replaced by translated values.
+ *
+ * @example
+ * // Assuming translate("form_fields.username") => "Username"
+ * formatStrings("Please enter your {0}.", ["username"]);
+ * // Returns: "Please enter your Username."
+ */
+export function formatStrings(str: string, replaceValues: string[]): string {
+  let formattedString = str;
+  for (const [index, value] of replaceValues.entries()) {
+    formattedString = formattedString.replace(
+      `{${index}}`,
+      //   translate(`form_fields.${value}`, { defaultValue: value })
+      ""
+    );
+  }
+  return formattedString;
+}
+
+/**
+ * Sets validation errors for form fields with translated messages.
+ *
+ * For each error entry, if the value is falsy, clears the error for that field.
+ * Otherwise, sets the error message by translating the main error type and
+ * formatting it with any extra values provided after a colon (`:`).
+ *
+ * @param setError - The function to set form field errors (e.g., from React Hook Form).
+ * @param errors - An object mapping field keys to error strings (e.g., "required", "minLength:3").
+ * @param translate - The translation function (typically from i18n).
+ *
+ * @example
+ * // Example errors: { username: "required", password: "minLength:8" }
+ * setErrors(setError, errors, t);
+ *
+ * // For "minLength:8", will call:
+ * // formatStrings(translate("validationMessages.minLength"), ["8"])
+ */
+export function setErrors(
+  setError: Function,
+  errors: object,
+  translate: TFunction
+): void {
+  if (!errors) return;
+  for (const [key, value] of Object.entries(errors)) {
+    if (key && !value) setError(key, { message: null });
+    else
+      setError(key, {
+        message: formatStrings(
+          translate(`validationMessages.${value?.split(":")[0]}`),
+          value?.split(":").slice(1)
+        ),
+      });
+  }
+}
+
+/**
+ * Translates an error key into a localized error message using the provided translation function.
+ *
+ * If no error key is given (i.e., `error` is `null` or empty), an empty string is returned.
+ * Otherwise, the error key is passed to the translation function, prefixed with
+ * "validationMessages." to map to your i18n validation messages.
+ *
+ * @param error - The error key as a string, or `null` if no error.
+ * @param translate - The translation function (typically from an i18n library like i18next).
+ * @returns {string} The translated error message, or an empty string if no error key is given.
+ *
+ * @example
+ * setErrorMessage("required", t)
+ * // If t("validationMessages.required") => "This field is required."
+ * // Returns: "This field is required."
+ *
+ * setErrorMessage(null, t)
+ * // Returns: ""
+ */
+export function setErrorMessage(
+  error: string | null,
+  translate: TFunction
+): string {
+  if (!error) return "";
+  return translate(`validationMessages.${error}`);
+}

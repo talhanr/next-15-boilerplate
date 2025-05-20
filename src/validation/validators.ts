@@ -1,7 +1,7 @@
 import { TFunction } from "i18next";
 import * as yup from "yup";
 import { ValidatorType } from "./types";
-import { getValidationMethod } from "./utils";
+import { formatStrings, getValidationMethod } from "./utils";
 
 interface MultipleReferenceValidatorProps {
   fieldName: string;
