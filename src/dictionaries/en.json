@@ -1,5 +1,6 @@
 {
-    "products": {
-      "cart": "Add to Cart"
-    }
+  "thankyou_message": "Thank you for your patience!",
+  "products": {
+    "cart": "Add to Cart"
   }
+}

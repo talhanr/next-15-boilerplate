@@ -1,6 +1,6 @@
+import { Dictionary } from "@/lib/dictionary/types/dictionary";
 import "server-only";
 
-import type { Dictionary } from "./types/dictionary";
 export type Locale = keyof typeof dictionaries;
 
 const dictionaries = {
