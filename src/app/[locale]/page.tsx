@@ -1,6 +1,19 @@
 import Image from "next/image";
+import { getDictionary } from "./dictonaries";
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: "en" | "de" }>;
+}) {
+  const { locale } = await params;
+  console.log(locale);
+
+  const dict = getDictionary(locale);
+
+  console.log(dict);
+  
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
