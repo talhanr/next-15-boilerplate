@@ -5,3 +5,8 @@ export type ValidatorType =
   | "array"
   | "date"
   | "boolean";
+
+export interface MultipleReferenceValidatorProps {
+  fieldName: string;
+  expectedValue: string | boolean;
+}
